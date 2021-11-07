@@ -1,0 +1,270 @@
+OVERALL FUNCTIONALITY (March 2021):
+
+Final & completed intent: This donation tracking service will be an open-source, free-use platform utilizing CRUD (Create, Read, Update, Delete) functions with role-based and more detailed restriction to allow
+volunteers and administrative members from various churches and religious bodies to serve as a secondary method of tracking donations as well as printing out receipts in a printable format.
+
+This platform will be run from a single platform run by its owner/administrator, who will be responsible for responding to tickets/requests from church administrators to solve issues or investigate inconsistencies in their
+records (Superadmin role).
+
+The administrator of a church (Note: for the sake of simplicity we use the term church, but this project is obviously agnostic/non-demoninational and any body that has to track donations and make receipts may be free to use
+it) will sign up and as a part of the process of making their own account, register their church into the system. Once this is completed, the church administrator (Admin role), will be able to invite volunteers/others
+from the church to join the site as users (user role), associated with their church. (In addition, users may join the website and be assigned to a church later on.)
+
+OVERALL FUNCTIONALITY (April 2021):
+
+Final & completed intent: This donation tracking service will be an open-source, free-use platform utilizing CRUD (Create, Read, Update, Delete) functions with role-based and more detailed restriction to allow
+volunteers and administrative members from various churches, religious bodies and organizations to serve as a secondary method of tracking donations as well as printing out receipts in a printable format.
+
+This platform will be run from a single platform run by its owner/administrator, who will be responsible for creating accounts for admins and users, as well as responding to tickets/requests from church administrators
+to solve issues or investigate inconsistencies in their records (Superadmin role).
+
+The administrator of a charity (Note: for the sake of simplicity we use the term charity, but this project is obviously agnostic/non-demoninational and any body that has to track donations and make receipts may be free to use
+it) will contact a superadmin through outside means (Possibly in the future, have admins fill out a front-end form to join the site which is sent to superadmin?) and be given account credentials once/if the superadmin makes
+their account. The admin will then be responsible for filling in the tables for donors and categories related to their charity/organization. Meanwhile, the superadmin will then need to onboard user-role members associated with
+the admin. Once a user is registered onto the site, they will only be able to view and enter donation information with donors and categories setup by their admin. Should a user realize they have made some sort of error, they should
+first contact an admin to edit & correct the mistake. Should an admin not be able to solve the issue, they should contact the superadmin who will have more robust access to the database.
+
+
+Current functionality: [Description of current level of completion/functionality goes here]
+
+FUNCTIONALITY BY ROLE (March 2021):
+
+Superadmin: The Superadmin will have full CRUD priveleges on every table.
+However, this role should be utilized as little as possible in order to avoid abuse or manipulation of the system. The superadmin should only be responding to tickets/emails/complaints from other members to try and solve
+issues with the tables or data within.
+
+Admin: The admin will be responsible for populating/managing users associated with their church. In addition, they will need to fill in details for donators associated with their church, charities and associated categories,
+assign specific charities to specific users and be responsible for day-to-day verification and adjustments to donations made by their users should an error occur. Once an admin has properly filled in donations, charities, categories
+and setup their volunteers with user accounts, the admin should not need to sign in regularly.
+
+User: Users will be the predominant day-to-day account type for the platform. Once an admin has set them up with an account and assigned them which charities they can interact with, they will only be able to input and view
+donation information based on what church they are associated with and what charities their admin has allowed them to interact with. Users will not be able to view the full information of donors, instead they will be using
+whatever anonymous donator ID system their church has implemented. Should a user realize they have made a mistake with their work, they will have to contact their admin to correct the issue.
+
+FUNCTIONALITY BY ROLE (April 2021):
+
+Superadmin:
+
+FUNCTIONALITY BY PAGE: The Superadmin will have full CRUD priveleges on every table.
+However, this role should be utilized as little as possible in order to avoid abuse or manipulation of the system. Aside from the creation of new accounts (Both admin and user), the superadmin should only be responding to
+tickets/emails/complaints from other members to try and solve issues with the tables or data within.
+
+Admin: The admin will be responsible for managing users associated with their charity. In addition, they will need to fill in details for donors associated with their charity and categories
+and be responsible for day-to-day verification and adjustments to donations made by their users should an error occur. Once an admin has properly filled in donors and categories, the admin should not need to sign in regularly.
+
+User: Users will be the predominant day-to-day account type for the platform. Once a superadmin has set them up with an account, they will only be able to input and view
+donation information based on what charity they are associated with. Users will not be able to view the full information of donors, instead they will be using
+whatever anonymous donator ID system their charity has implemented. Should a user realize they have made a mistake with their work, they will have to contact their admin to correct the issue.
+
+
+
+FUNCTIONALITY BY PAGE (April 2021):
+
+Dashboard/front page:
+
+    The homepage is referred to as the ‘dashboard’ on this application.
+    Upon logging in/registering the userType is checked/authorized and allowed entry to the dashboard.
+
+    The file layout is as follows:
+
+    dashboard.blade.php contains a livewire component: @livewire(‘homepage’).
+    The homepage component is where you can edit the dashboard.
+
+    The dashboard consists of:
+        -Nav bar
+        -Dashboard title
+        -Welcome component with sections pertaining to the applications function.
+
+    Nav:
+        The nav bar for the application has visibility based on role.
+        Admin and Super admin will see the entire nav bar, and its routes.
+        Users will only be able to see the first two links: Dashboard, Donations.
+        This is shown in the navigation-menu.blade.php file
+        !NB:
+          For the charity page route there are two destinations and thus is written seperately inside the navigation menu(view navigation-menu.blade.php for more detail).
+
+        Snippet of navigation-menu.blade.php:
+
+            <!-- Navigation Links -->
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-jet-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
+                    </x-jet-nav-link>
+
+                     <x-jet-nav-link href="{{ route('donation.index') }}" :active="request()->routeIs('donation.index')">
+                        {{ __('Donations') }}
+                    </x-jet-nav-link>
+
+                    @if (Auth::user()->isAdmin() || Auth::user()->isSuperAdmin())
+
+                    <x-jet-nav-link href="{{ route('user.index') }}" :active="request()->routeIs('user.*')">
+                        {{ __('Users') }}
+                    </x-jet-nav-link>
+
+                    <x-jet-nav-link href="#">
+                        {{ __('Reporting') }}
+                    </x-jet-nav-link>
+
+        The function you see in the @if statement is to determine is the user’s role is admin or SuperAdmin.
+        Seen in the User.php file here:
+             public function isAdmin()
+                {
+                if(session()->has("userType")){
+                        return session()->get("userType") == "admin";
+                }
+                else{
+                    $user = DB::select('select * from users where id = :id', ['id' => Auth::id()]);
+                    session()->put("userType" , $user[0]->user_type);
+                    return session()->get("userType") == "admin";
+                }
+                }
+        This function is repeated for super_admin.
+
+    Dashboard components:
+        The dashboards title component can be edited within the livewire component that is included.
+
+        ~\donationtracker\resources\views\dashboard.blade.php contains the livewire component ‘homepage’
+
+        which is found here:
+        ~\donationtracker\resources\views\livewire\homepage.blade.php
+
+        You can edit this to make changes to the homepage.
+        Alternatively you can create a new component and replace the following code in dashboard.blade.php to match.
+        Simply create the blade component and reference the name of the component.
+
+        The component is included with @livewire('insert component name here')
+
+        EX: frontpage.blade.php == @livewire(‘frontpage’)
+
+        As long as the file is under the folder ‘Views\’, called ‘livewire’ - the component will work when included.
+
+
+
+
+
+User registration:
+
+   A user has the ability to register on the normal webpage with a name, email, password, and a confirm password.
+         -> Note that it might be easier to change the email to a username, making it easier to validate and making
+         more sense for listing users by username instead of email.
+
+   There is a radiobutton feature that allows the user to create a new charity when registered. However, making an
+   admin currently requires DB functionality, since the user management page could not be implemented properly.\
+
+   Another feature that was going to be implemented was a charity-request function and DB table. A user could either:
+       A. Sign up as a user and select their charity, sending a request to join a charity, where the admin of that church can either
+          accept/decline the request on the Users page.
+       B. An admin request, where the user creates a new charity when signing up their account, they have the option to check off a
+          "Request Admin" option, where another charity request is sent, this time only accessible by a super admin, where they can
+          acccept/decline the request. (both A and B would use the same table, table entities below)
+
+            ------ Charity Request Table -----
+
+            -> ID
+            -> user_id (foreign to user)
+            -> charity_id (foreign to charity being requested)
+            -> request_type (either "admin" or "user")
+            -> accepted (true or false)
+
+User page:
+*** not fully implemented***
+   A super admin has the ability to make other users admins and assign ANY charity to any user. A super admin can
+   also deactivate specific accounts and unlink charity, as well as demote an admin to a user. They also have the ability
+   to accept/decline charity admin requests sent in by new users that create new charities, listed above.
+
+   An admin's functionality on the user's page is to add users to their charity. They have ability to accept/decline users from joining
+   their church, as well as remove users from their church.
+
+*At current implementation*:
+    The users page takes in the data from users table and displays it on this page’s table.
+    Name, email, charity ID, status and role are all shown.
+    The page uses a tailwindCSS table UI component with elements edited to fit the application.
+    The elements in the table head are plaintext, the elements in the body of the table call upon the users table for data.
+
+    Snippet:
+    <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach ($users as $user)
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $user->name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $user->email }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ $user->charity_id }}
+                        </td>
+
+
+
+Donation page:
+
+Donator page:
+*** not implemented***
+   All roles have the ability to create a donator. This is crutial information to input when creating a donation. The address, phone, and email
+   are optional at the moment, but you can change this based on feedback from the client.
+
+Charity page:
+As per client requirement we have three kind of users
+•	Super Admin
+•	Admin
+•	Donor
+There are two use of this page
+1.	For Admin:- when a user register as charity Admin, he/she can edit, update or delete general information regarding charity.
+User can also delete the charity but data will be still store in the database
+Privilege of admin can only be given super admin from the database.
+
+2.	For Super Admin:- There only one super admin who will manage the whole web Application.
+Job of super admin is to give permission to create charity Admin.
+Super Admin have access to all the charities but Super Admin does not have privilege to edit the Charity Admin Details.
+Super Admin can delete the charity.
+
+Category Page:
+
+	Category page show the list of categories of current(Logged-in) charity. All the users can see the list of categories.
+	User with Admin role can create category by entering "Name" and "Description" values. By default, All the categories will be "Active".
+	User with Admin role can Edit the category.
+
+
+Old Requirements
+
+Users and their roles:
+1.	Super Admin:
+a.	This is a person who will manage entire application.
+b.	The major task of this user will be
+i.	Create a church
+ii.	Create an Admin user.
+iii.	Can perform every action done by other User (May not delivered considering time crunch).
+(Do we have more than one admin for each church?)
+2.	Admin:
+a.	This is a person who will manage all the categories, charities and volunteer related to church.
+b.	He/she will add/update/delete/view charities.
+c.	He/she will add/update/delete/view categories associated with charities.
+d.	He/she will add/update/delete/view volunteer associated with the charities.
+e.	Can perform every action done by other volunteer. (May not delivered considering time crunch).
+f.	Generate tax report (May not delivered considering time crunch).
+3.	Volunteer:
+a.	Add donations.
+b.	Can Update/View donation add by themselves
+
+Categories page: (should be implemented on the charity page, an option to create a category should be available on the "my church" page accessible by admins)
+
+
+
+NOTES & CONCERNS REGARDING FUNCTIONALITY:
+
+1: Under no circumstances should any data be 'deleted' on the back-end. All tables and rows within tables have a boolean value for active. Should an admin need to 'delete' something, rather than removing it from the table and
+risk issues with database integrity, the data should instead be set to FALSE for active. Front-end terminology for buttons and descriptions should still use the word "delete", but from a functional perspective we are simply
+hiding deleted information from database query results.
+
+2: Currently, work still needs to be done to implement printing donation receipts to PDF. This is one of the few use-cases where inactive data will need to be retained and stay available, I.E: if an admin deletes a charity
+they will still need its information to be in the database to write receipts in the future for any donations that were made to them before the charity was deleted. If possible, consider some sort of annual 'purge' of deleted data?
+
+3: There is currently no system, enforcement or structure in place to actually confirm that an admin signing up for the site is actually affiliated with any church/charity. As it stands, the service works entirely on the honour system.
+This could prove to be an issue if any sort of fraud-based or government regulation requires certain amount of due diligence on the part of the platform. These concerns should be investigated, but the topics seem to be
+above the knowledge and abilities of a developer (I.E: get legal consultation)
+
+4: In the future, it should be possible for a superadmin to toggle between two forms of admin/user creation. It should be made possible that admins and users can create their own accounts without the intervention of the
+superadmin.
+
+If you have any additional questions about this project, please send an email to the project manager at this email address: justinclyon@outlook.com
